@@ -2,9 +2,24 @@
 
 ## Requirements
 
-none
+- C compiler
+- make
 
 ## Building
 
 `make` - generate configure script and build whole project
-`make run` - run main file
+
+## Usage
+
+`gen_file --help` - show help and usage examples
+
+## Installation
+
+`make dist` - generate installation bundle which can be installed
+using following steps:
+
+1. `./configure`
+2. `make`
+3. `make install`
+
+Package may be uninstalled using `make uninstall`
