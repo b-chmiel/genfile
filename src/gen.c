@@ -62,7 +62,10 @@ int gen_file(const struct arguments *arguments) {
     }
     buffer[chunk_size - 1] = '\0';
 
-    fwrite(buffer, chunk_size, 1, file);
+    if (fwrite(buffer, chunk_size, 1, file) < chunk_size) {
+      fprintf(stderr, "No Space Left on Device\n");
+      return EXIT_FAILURE;
+    }
   }
 
   return EXIT_SUCCESS;
