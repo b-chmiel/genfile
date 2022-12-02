@@ -5,11 +5,7 @@ TARGET_RELEASE = $(BUILD_DIR_RELEASE)/src/gen_file
 
 all: $(TARGET_RELEASE)
 
-run: $(TARGET_RELEASE)
-	$(MAKE) -C $(BUILD_DIR_RELEASE)
-	./$(TARGET_RELEASE)
-
-$(TARGET_RELEASE): $(BUILD_DIR_RELEASE)
+$(TARGET_RELEASE): $(BUILD_DIR_RELEASE) src/main.c
 	$(MAKE) -C $(BUILD_DIR_RELEASE)
 
 configure:
@@ -20,7 +16,7 @@ dist: $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_RELEASE): configure
 	-mkdir -v $(BUILD_DIR_RELEASE)
-	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-O3'
+	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Og -g'
 
 clean:
 	-rm -rfv $(BUILD_DIR_DEBUG)
