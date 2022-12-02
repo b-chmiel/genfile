@@ -1,6 +1,10 @@
 #include <argp.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 const char *argp_program_version = "gen_file 1.0";
 const char *argp_program_bug_address = "bachm44@gmail.com";
@@ -61,9 +65,55 @@ static const char doc[] =
 
 static struct argp argp = {options, parse_opt, args_doc, doc};
 
+char *substring(const char *str, size_t start, size_t end) {
+  char *result = malloc(sizeof(char) * sizeof(end - start + 1));
+  strncpy(result, str + start, end - start);
+  return result;
+}
+
+long parse_size(const char *size) {
+  long result;
+  char last = size[strlen(size) - 1];
+
+  if (last == 'G') {
+    char *size_num = substring(size, 0, strlen(size) - 1);
+    result = (long int)atoi(size_num) * (long int)1073741824;
+    free(size_num);
+  } else if (last == 'M') {
+    char *size_num = substring(size, 0, strlen(size) - 1);
+    result = (long int)atoi(size_num) * (long int)1048576;
+    free(size_num);
+  }
+
+  return result;
+}
+
+int gen_file(const struct arguments *arguments) {
+  const int size_bytes = parse_size(arguments->size);
+  srand(arguments->seed);
+
+  int file =
+      open(arguments->filename, O_CREAT | O_RDWR, S_IRWXO | S_IRWXU | S_IRWXG);
+
+  const int chunk_size =
+      sizeof(char) * 1024 * 1024 + 1; // 1 megabyte + 1 null terminator
+
+  unsigned char buffer[chunk_size];
+  for (int i = 0; i < size_bytes; i += chunk_size) {
+    for (int j = 0; j < chunk_size - 1; ++j) {
+      buffer[j] = rand();
+    }
+    buffer[chunk_size - 1] = '\0';
+
+    write(file, buffer, chunk_size - 1);
+  }
+
+  return EXIT_SUCCESS;
+}
+
 int main(int argc, char *argv[]) {
   struct arguments arguments = {
-      .filename = "file", .seed = 420, .size = "1G", .verbose = 1};
+      .filename = "file", .seed = 420, .size = "1G", .verbose = 0};
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
@@ -74,5 +124,5 @@ int main(int argc, char *argv[]) {
     printf("verbose = %d\n", arguments.verbose);
   }
 
-  return EXIT_SUCCESS;
+  return gen_file(&arguments);
 }
