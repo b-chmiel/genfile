@@ -16,7 +16,7 @@ dist: $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_RELEASE): configure
 	-mkdir -v $(BUILD_DIR_RELEASE)
-	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Og -g'
+	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-O2'
 
 clean:
 	-rm -rfv $(BUILD_DIR_DEBUG)
