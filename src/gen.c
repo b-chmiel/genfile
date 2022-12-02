@@ -47,22 +47,22 @@ static long parse_size(const char *size) {
 }
 
 int gen_file(const struct arguments *arguments) {
-  const int size_bytes = parse_size(arguments->size);
+  const long size_bytes = parse_size(arguments->size);
   srand(arguments->seed);
 
   FILE *file = fopen(arguments->filename, "w+");
 
-  const int chunk_size =
+  const size_t chunk_size =
       sizeof(char) * pow(1024, 2) + 1; // 1 megabyte + 1 null terminator
 
   unsigned char buffer[chunk_size];
-  for (int i = 0; i < size_bytes; i += chunk_size) {
-    for (int j = 0; j < chunk_size - 1; ++j) {
+  for (long i = 0; i < size_bytes; i += chunk_size) {
+    for (size_t j = 0; j < chunk_size - 1; ++j) {
       buffer[j] = rand();
     }
     buffer[chunk_size - 1] = '\0';
 
-    if (fwrite(buffer, chunk_size, 1, file) < chunk_size) {
+    if (fwrite(buffer, chunk_size, 1, file) != 1) {
       fprintf(stderr, "No Space Left on Device\n");
       return EXIT_FAILURE;
     }
