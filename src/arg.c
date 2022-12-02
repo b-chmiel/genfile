@@ -11,7 +11,7 @@ typedef enum bool {
   TRUE = 1,
 } bool_t;
 
-const char *argp_program_version = "gen_file 1.0.2";
+const char *argp_program_version = "gen_file 1.0.3";
 const char *argp_program_bug_address = "bachm44@gmail.com";
 
 static struct argp_option options[] = {
