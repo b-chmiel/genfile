@@ -1,0 +1,10 @@
+# gen_file
+
+## Requirements
+
+none
+
+## Building
+
+`make` - generate configure script and build whole project
+`make run` - run main file
