@@ -22,5 +22,5 @@ clean:
 	-rm -rfv $(BUILD_DIR_DEBUG)
 	-rm -rfv $(BUILD_DIR_RELEASE)
 	-rm -rfv autom4te.cache
-	-rm -fv missing install-sh depcomp configure config.h.in aclocal.m4
+	-rm -fv missing install-sh depcomp configure config.h.in aclocal.m4 compile
 	-find . -name "Makefile.in" -type f -delete
