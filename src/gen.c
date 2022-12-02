@@ -1,13 +1,17 @@
 #include "gen.h"
 #include "arg.h"
+#include <ctype.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 static char *substring(const char *str, size_t start, size_t end) {
-  char *result = malloc(sizeof(char) * sizeof(end - start + 1));
-  strncpy(result, str + start, end - start);
+  const size_t length = end - start;
+  char *result = malloc(sizeof(char) * sizeof(length + 1));
+  strncpy(result, str + start, length);
+  result[length] = '\0';
+
   return result;
 }
 
@@ -17,14 +21,26 @@ static long parse_size(const char *size) {
 
   const char last = size[input_length - 1];
 
+  char *size_num = substring(size, 0, strlen(size) - 1);
+
+  for (size_t i = 0; i < strlen(size_num); ++i) {
+    if (!isdigit(size_num[i])) {
+      fprintf(stderr, "Number required before postfix: %s\n", size_num);
+      free(size_num);
+      exit(EXIT_FAILURE);
+    }
+  }
+
   if (last == 'G') {
-    char *size_num = substring(size, 0, strlen(size) - 1);
     result = (long int)atoi(size_num) * (long int)pow(1024, 3);
     free(size_num);
   } else if (last == 'M') {
-    char *size_num = substring(size, 0, strlen(size) - 1);
     result = (long int)atoi(size_num) * (long int)pow(1024, 2);
     free(size_num);
+  } else {
+    fprintf(stderr, "G or M postfix required: %s\n", size_num);
+    free(size_num);
+    exit(EXIT_FAILURE);
   }
 
   return result;

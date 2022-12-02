@@ -1,5 +1,6 @@
 #include "arg.h"
 #include <argp.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,10 +15,10 @@ const char *argp_program_version = "gen_file 1.0";
 const char *argp_program_bug_address = "bachm44@gmail.com";
 
 static struct argp_option options[] = {
-    {"verbose", 'v', 0, OPTION_ARG_OPTIONAL, "Verbose output"},
+    {"verbose", 'v', 0, OPTION_ARG_OPTIONAL, "Verbose output", 0},
     {"seed", 'z', "SEED", OPTION_ARG_OPTIONAL,
-     "Integer used for generating random file content"},
-    {"size", 's', "SIZE", OPTION_ARG_OPTIONAL, "File size"},
+     "Integer used for generating random file content", 0},
+    {"size", 's', "SIZE", OPTION_ARG_OPTIONAL, "File size", 0},
     {0}};
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -30,6 +31,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   case 'z':
     if (arg == NULL) {
       argp_usage(state);
+    }
+
+    for (size_t i = 0; i < strlen(arg); ++i) {
+      if (!isdigit(arg[i])) {
+        argp_usage(state);
+      }
     }
 
     arguments->seed = atoi(arg);
@@ -60,7 +67,7 @@ static const char args_doc[] = "FILENAME";
 static const char doc[] =
     "gen_file -- A program to generate random file with fixed seed ";
 
-static struct argp argp = {options, parse_opt, args_doc, doc};
+static struct argp argp = {options, parse_opt, args_doc, doc, .children = NULL};
 
 void validate(const struct arguments *arguments) {
   bool_t is_error = FALSE;
@@ -76,7 +83,7 @@ void validate(const struct arguments *arguments) {
   }
 
   if (arguments->seed < 0 || arguments->seed >= INT_MAX) {
-    fprintf(stderr, "Seed should be a positive integer\n", ARGUMENT_MAX_SIZE);
+    fprintf(stderr, "Seed should be a positive integer: %d\n", arguments->seed);
     is_error = TRUE;
   }
 

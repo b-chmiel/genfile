@@ -5,8 +5,10 @@ TARGET_RELEASE = $(BUILD_DIR_RELEASE)/src/gen_file
 
 all: $(TARGET_RELEASE)
 
-$(TARGET_RELEASE): $(BUILD_DIR_RELEASE) src/main.c
+$(TARGET_RELEASE): FORCE $(BUILD_DIR_RELEASE)
 	$(MAKE) -C $(BUILD_DIR_RELEASE)
+
+FORCE: ;
 
 configure:
 	autoreconf --install
@@ -16,7 +18,7 @@ dist: $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_RELEASE): configure
 	-mkdir -v $(BUILD_DIR_RELEASE)
-	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-O2'
+	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-O2 -Wall -Wextra -pedantic'
 
 clean:
 	-rm -rfv $(BUILD_DIR_DEBUG)
