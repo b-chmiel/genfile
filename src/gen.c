@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 static char *substring(const char *str, size_t start, size_t end) {
   const size_t length = end - start;
@@ -51,6 +52,10 @@ int gen_file(const struct arguments *arguments) {
   srand(arguments->seed);
 
   FILE *file = fopen(arguments->filename, "w+");
+  if (file == NULL) {
+    fprintf(stderr, "Could not create file '%s', %s\n", arguments->filename, strerror(errno));
+    return EXIT_FAILURE;
+  }
 
   const size_t chunk_size =
       sizeof(char) * pow(1024, 2) + 1; // 1 megabyte + 1 null terminator
@@ -63,10 +68,14 @@ int gen_file(const struct arguments *arguments) {
     buffer[chunk_size - 1] = '\0';
 
     if (fwrite(buffer, chunk_size, 1, file) != 1) {
-      fprintf(stderr, "No Space Left on Device\n");
+      fprintf(stderr, "%s\n", strerror(errno));
+      fclose(file);
+
       return EXIT_FAILURE;
     }
   }
+
+  fclose(file);
 
   return EXIT_SUCCESS;
 }
