@@ -53,6 +53,20 @@ int gen_file(const struct arguments *arguments) {
 
   FILE *file = fopen(arguments->filename, "w+");
   if (file == NULL) {
+
+    // FIXME: handle no such file or directory and file exists errors
+    // for copyfs testing
+    if (errno == 17 || errno == 2) {
+      while (file == NULL) {
+        fprintf(stderr, "Could not create file '%s', retrying\n", strerror(errno));
+        int rnd = rand();
+        int number_length = snprintf(NULL, 0, "%d", rnd);
+
+        char * new_filename = 
+        file = fopen(arguments->filename, "w+");
+      }
+    }
+
     fprintf(stderr, "Could not create file '%s', %s\n", arguments->filename, strerror(errno));
     return EXIT_FAILURE;
   }
