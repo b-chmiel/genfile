@@ -5,13 +5,16 @@
 #include <string.h>
 
 #define ARGUMENT_MAX_SIZE 255
+#ifndef GIT_VERSION
+  #error "GIT_VERSION NOT DEFINED"
+#endif
 
 typedef enum bool {
   FALSE = 0,
   TRUE = 1,
 } bool_t;
 
-const char *argp_program_version = "gen_file 1.0.4";
+const char *argp_program_version = "gen_file-1.0.5-dev-" GIT_VERSION;
 const char *argp_program_bug_address = "bachm44@gmail.com";
 
 static struct argp_option options[] = {
