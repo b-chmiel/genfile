@@ -10,16 +10,24 @@ AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 ])
+AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
 AC_PROG_CC
+LT_PREREQ([2.4])
+LT_INIT
 
-# Checks for libraries.
+AC_ARG_WITH([argp-standalone],
+	AS_HELP_STRING([--with-argp-standalone], [compile with argp-standalone]),
+	[], with_argp_standalone=no)
 
-# Checks for header files.
+if test "${with_argp_standalone}" = "yes"; then
+ AC_CHECK_LIB(argp, 
+	argp_parse,
+	[LIB_ARGP_STANDALONE="-largp"],
+	AC_MSG_ERROR([argp-standalone selected but not found]))
+fi
 
-# Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
+AC_SUBST([LIB_ARGP_STANDALONE])
 
 AC_OUTPUT

@@ -2,6 +2,7 @@ SHELL = /bin/sh
 
 BUILD_DIR_RELEASE = build
 TARGET_RELEASE = $(BUILD_DIR_RELEASE)/src/gen_file
+CC=../external/musl/install/bin/musl-gcc
 
 all: $(TARGET_RELEASE)
 
