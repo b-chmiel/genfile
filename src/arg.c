@@ -1,12 +1,13 @@
 #include "arg.h"
 #include <argp.h>
 #include <ctype.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define ARGUMENT_MAX_SIZE 255
 #ifndef GIT_VERSION
-  #error "GIT_VERSION NOT DEFINED"
+#error "GIT_VERSION NOT DEFINED"
 #endif
 
 typedef enum bool {

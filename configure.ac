@@ -10,12 +10,9 @@ AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 ])
-AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
 AC_PROG_CC
-LT_PREREQ([2.4])
-LT_INIT
 
 AC_ARG_WITH([argp-standalone],
 	AS_HELP_STRING([--with-argp-standalone], [compile with argp-standalone]),
