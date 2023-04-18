@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
   struct arguments arguments = {
-      .filename = "file", .seed = 420, .size = "1G", .verbose = 0};
+      .filename = "file", .seed = 420, .size = "10M", .verbose = 0};
 
   parse(argc, argv, &arguments);
 

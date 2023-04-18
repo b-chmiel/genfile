@@ -1,7 +1,9 @@
 #include "arg.h"
+#include "bool.h"
 #include <argp.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,11 +11,6 @@
 #ifndef GIT_VERSION
 #error "GIT_VERSION NOT DEFINED"
 #endif
-
-typedef enum bool {
-  FALSE = 0,
-  TRUE = 1,
-} bool_t;
 
 const char *argp_program_version = "gen_file-1.0.5-dev-" GIT_VERSION;
 const char *argp_program_bug_address = "bachm44@gmail.com";
@@ -48,8 +45,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   case 's':
     arguments->size = arg;
     break;
+  case ARGP_KEY_NO_ARGS:
+    fprintf(stderr, "FILENAME missing.\n");
+    break;
   case ARGP_KEY_ARG:
     if (state->arg_num >= 4) {
+      fprintf(stderr, "Too many cli arguments.\n");
       argp_usage(state);
     }
     arguments->filename = arg;

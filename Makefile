@@ -19,12 +19,12 @@ dist: $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_RELEASE): configure
 	-mkdir -v $(BUILD_DIR_RELEASE)
-	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-O2 -Wall -Wextra -pedantic'
+	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Og -g -Wall -Wextra -pedantic'
 
 clean:
 	-rm -rfv $(BUILD_DIR_DEBUG)
 	-rm -rfv $(BUILD_DIR_RELEASE)
 	-rm -rfv autom4te.cache
 	-rm -rfv m4
-	-rm -fv missing install-sh depcomp configure config.h.in aclocal.m4 compile configure~
+	-rm -fv missing install-sh depcomp configure config.h.in aclocal.m4 compile configure~ ltmain.sh config.sub config.guess
 	-find . -name "Makefile.in" -type f -delete
