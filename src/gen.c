@@ -60,11 +60,19 @@ static long parse_size(const char *size) {
   return result;
 }
 
-static int write_char_by_char(long size_bytes, FILE *file) {
+static inline char generate(generator_type_t type) {
+  if (type == NON_ASCII)
+    return rand();
+
+  return 'A' + (rand() % 26);
+}
+
+static int write_char_by_char(long size_bytes, FILE *file,
+                              generator_type_t type) {
   fprintf(stderr, "Writing char by char with size_bytes = %ld\n", size_bytes);
 
   for (long i = 0; i < size_bytes; i++) {
-    const char c = rand();
+    const char c = generate(type);
     if (fwrite(&c, 1, sizeof(c), file) != 1) {
       fprintf(stderr, "%s\n", strerror(errno));
       return EXIT_FAILURE;
@@ -74,7 +82,8 @@ static int write_char_by_char(long size_bytes, FILE *file) {
   return EXIT_SUCCESS;
 }
 
-static int write_chunks(size_t chunk_size, long size_bytes, FILE *file) {
+static int write_chunks(size_t chunk_size, long size_bytes, FILE *file,
+                        generator_type_t type) {
   fprintf(stderr,
           "Writing chunk by chunk with chunk_size = %ld, size_bytes = %ld\n",
           chunk_size, size_bytes);
@@ -82,7 +91,7 @@ static int write_chunks(size_t chunk_size, long size_bytes, FILE *file) {
   unsigned char buffer[chunk_size];
   for (long i = 0; i < size_bytes; i += chunk_size) {
     for (size_t j = 0; j < chunk_size - 1; ++j) {
-      buffer[j] = rand();
+      buffer[j] = generate(type);
     }
     buffer[chunk_size - 1] = '\0';
 
@@ -111,9 +120,9 @@ int gen_file(const struct arguments *arguments) {
 
   int ret = EXIT_FAILURE;
   if (chunk_size > (size_t)size_bytes) {
-    ret = write_char_by_char(size_bytes, file);
+    ret = write_char_by_char(size_bytes, file, arguments->type);
   } else {
-    ret = write_chunks(chunk_size, size_bytes, file);
+    ret = write_chunks(chunk_size, size_bytes, file, arguments->type);
   }
 
   fclose(file);

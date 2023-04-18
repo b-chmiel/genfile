@@ -20,6 +20,8 @@ static struct argp_option options[] = {
     {"seed", 'z', "SEED", OPTION_ARG_OPTIONAL,
      "Integer used for generating random file content", 0},
     {"size", 's', "SIZE", OPTION_ARG_OPTIONAL, "File size", 0},
+    {"type", 't', "TYPE", OPTION_ARG_OPTIONAL,
+     "Generation type: 0 for ASCII, 1 for non ASCII", 0},
     {0}};
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -44,6 +46,15 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     break;
   case 's':
     arguments->size = arg;
+    break;
+  case 't':
+    if (strlen(arg) != 1 || (arg[0] != '0' && arg[0] != '1')) {
+      fprintf(stderr,
+              "Wrong format of generation type: '%s'. Should be 0 or 1\n", arg);
+      argp_usage(state);
+    }
+
+    arguments->type = atoi(arg);
     break;
   case ARGP_KEY_NO_ARGS:
     fprintf(stderr, "FILENAME missing.\n");
