@@ -9,6 +9,10 @@
 
 `make` - generate configure script and build whole project
 
+## Testing
+
+`make test` - activate python environment, compile and run tests
+
 ## Usage
 
 `gen_file --help` - show help and usage examples

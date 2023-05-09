@@ -19,10 +19,19 @@ dist: $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_RELEASE): configure
 	-mkdir -v $(BUILD_DIR_RELEASE)
-	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Og -g -Wall -Wextra -pedantic'
+	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Ofast -g -Wall -Wextra -pedantic'
+
+env: env/touchfile
+
+env/touchfile: requirements.txt
+	test -d env || python -m venv env
+	. env/bin/activate && pip install -r requirements.txt
+	touch env/touchfile
+
+test: env $(TARGET_RELEASE)
+	. env/bin/activate && pytest test/test.py
 
 clean:
-	-rm -rfv $(BUILD_DIR_DEBUG)
 	-rm -rfv $(BUILD_DIR_RELEASE)
 	-rm -rfv autom4te.cache
 	-rm -rfv m4

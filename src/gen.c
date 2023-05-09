@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,9 +28,9 @@ static bool_t have_postfix(const char *size) {
   return FALSE;
 }
 
-static long parse_size(const char *size) {
+static uint64_t parse_size(const char *size) {
   if (!have_postfix(size)) {
-    return (long int)atoi(size);
+    return (uint64_t)atoi(size);
   }
 
   char *size_num = substring(size, 0, strlen(size) - 1);
@@ -44,12 +45,12 @@ static long parse_size(const char *size) {
 
   const char last = size[strlen(size) - 1];
 
-  long result;
+  uint64_t result;
   if (last == 'G') {
-    result = (long int)atoi(size_num) * (long int)pow(1024, 3);
+    result = (uint64_t)atoi(size_num) * (uint64_t)pow(1024, 3);
     free(size_num);
   } else if (last == 'M') {
-    result = (long int)atoi(size_num) * (long int)pow(1024, 2);
+    result = (uint64_t)atoi(size_num) * (uint64_t)pow(1024, 2);
     free(size_num);
   } else {
     fprintf(stderr, "G or M postfix required: %s\n", size_num);
@@ -67,11 +68,11 @@ static inline char generate(generator_type_t type) {
   return 'A' + (rand() % 26);
 }
 
-static int write_char_by_char(long size_bytes, FILE *file,
+static int write_char_by_char(uint64_t size_bytes, FILE *file,
                               generator_type_t type) {
   fprintf(stderr, "Writing char by char with size_bytes = %ld\n", size_bytes);
 
-  for (long i = 0; i < size_bytes; i++) {
+  for (uint64_t i = 0; i < size_bytes; i++) {
     const char c = generate(type);
     if (fwrite(&c, 1, sizeof(c), file) != 1) {
       fprintf(stderr, "%s\n", strerror(errno));
@@ -82,18 +83,21 @@ static int write_char_by_char(long size_bytes, FILE *file,
   return EXIT_SUCCESS;
 }
 
-static int write_chunks(size_t chunk_size, long size_bytes, FILE *file,
+static int write_chunks(uint64_t chunk_size, uint64_t size_bytes, FILE *file,
                         generator_type_t type) {
+  const uint64_t total_chunks = size_bytes / chunk_size;
+  const uint64_t total_bytes = total_chunks * chunk_size;
   fprintf(stderr,
-          "Writing chunk by chunk with chunk_size = %ld, size_bytes = %ld\n",
-          chunk_size, size_bytes);
+          "Writing chunk by chunk with chunk_size = %ld, num_of_chunks = %ld, "
+          "total_bytes = %ld\n",
+          chunk_size, total_chunks, total_bytes);
 
-  unsigned char buffer[chunk_size];
-  for (long i = 0; i < size_bytes; i += chunk_size) {
-    for (size_t j = 0; j < chunk_size - 1; ++j) {
+  unsigned char buffer[chunk_size + 1];
+  for (uint64_t i = 0; i < total_chunks; ++i) {
+    for (uint64_t j = 0; j < chunk_size; ++j) {
       buffer[j] = generate(type);
     }
-    buffer[chunk_size - 1] = '\0';
+    buffer[chunk_size] = '\0';
 
     if (fwrite(buffer, chunk_size, 1, file) != 1) {
       fprintf(stderr, "%s\n", strerror(errno));
@@ -105,7 +109,9 @@ static int write_chunks(size_t chunk_size, long size_bytes, FILE *file,
 }
 
 int gen_file(const struct arguments *arguments) {
-  const long size_bytes = parse_size(arguments->size);
+  const uint64_t size_bytes = parse_size(arguments->size);
+  fprintf(stderr, "Writing file with size %ld bytes\n", size_bytes);
+
   srand(arguments->seed);
 
   FILE *file = fopen(arguments->filename, "w+");
@@ -115,14 +121,18 @@ int gen_file(const struct arguments *arguments) {
     return EXIT_FAILURE;
   }
 
-  const size_t chunk_size =
-      sizeof(char) * pow(1024, 2) + 1; // 1 megabyte + 1 null terminator
+  const uint64_t chunk_size = sizeof(char) * pow(1024, 2); // 1 megabyte
 
   int ret = EXIT_FAILURE;
-  if (chunk_size > (size_t)size_bytes) {
+  if (chunk_size > size_bytes) {
     ret = write_char_by_char(size_bytes, file, arguments->type);
   } else {
     ret = write_chunks(chunk_size, size_bytes, file, arguments->type);
+
+    const uint64_t remainder = size_bytes % chunk_size;
+    if (remainder != 0) {
+      ret = write_char_by_char(remainder, file, arguments->type);
+    }
   }
 
   fclose(file);
