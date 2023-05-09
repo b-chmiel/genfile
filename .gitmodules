@@ -1,0 +1,3 @@
+[submodule "external/argp-standalone"]
+	path = external/argp-standalone
+	url = https://github.com/ericonr/argp-standalone

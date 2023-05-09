@@ -1,25 +1,39 @@
 SHELL = /bin/sh
 
-BUILD_DIR_RELEASE = build
-TARGET_RELEASE = $(BUILD_DIR_RELEASE)/src/gen_file
-CC=../external/musl/install/bin/musl-gcc
+BUILD_DIR_RELEASE = build_release
+BUILD_DIR_DEBUG = build
+TARGET = $(BUILD_DIR_DEBUG)/src/gen_file
+ARGP_PATH=$(shell pwd)/external/argp-standalone
+ARGP_LIB=$(ARGP_PATH)/libargp.a
 
-all: $(TARGET_RELEASE)
+all: $(TARGET)
 
-$(TARGET_RELEASE): FORCE $(BUILD_DIR_RELEASE)
-	$(MAKE) -C $(BUILD_DIR_RELEASE)
+$(TARGET): FORCE $(BUILD_DIR_DEBUG)
+	$(MAKE) -C $(BUILD_DIR_DEBUG)
 
 FORCE: ;
 
 configure:
 	autoreconf --install
 
-dist: $(BUILD_DIR_RELEASE)
+dist: configure
+	-mkdir -v $(BUILD_DIR_RELEASE)
+	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Ofast -Wall -Wextra -pedantic'
 	$(MAKE) -C $(BUILD_DIR_RELEASE) dist
 
-$(BUILD_DIR_RELEASE): configure
-	-mkdir -v $(BUILD_DIR_RELEASE)
-	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Ofast -g -Wall -Wextra -pedantic'
+$(BUILD_DIR_DEBUG): configure $(ARGP_LIB)
+	-mkdir -v $(BUILD_DIR_DEBUG)
+	cd $(BUILD_DIR_DEBUG) && ../configure \
+		LDFLAGS='-L $(ARGP_PATH)' \
+		CFLAGS='-O0 -g -Wall -Wextra -pedantic -I $(ARGP_PATH)' \
+		--with-argp-standalone=yes
+
+$(ARGP_LIB):
+	cd $(ARGP_PATH) && \
+		autoreconf --install && \
+		./configure && \
+		$(MAKE)
+
 
 env: env/touchfile
 
@@ -28,10 +42,11 @@ env/touchfile: requirements.txt
 	. env/bin/activate && pip install -r requirements.txt
 	touch env/touchfile
 
-test: env $(TARGET_RELEASE)
+test: env $(TARGET)
 	. env/bin/activate && pytest test/test.py
 
 clean:
+	-rm -rfv $(BUILD_DIR_DEBUG)
 	-rm -rfv $(BUILD_DIR_RELEASE)
 	-rm -rfv autom4te.cache
 	-rm -rfv m4
