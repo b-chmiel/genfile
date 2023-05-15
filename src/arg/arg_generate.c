@@ -1,19 +1,6 @@
+#include "arg_generate.h"
 #include "arg.h"
-#include "bool.h"
 #include <argp.h>
-#include <ctype.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define ARGUMENT_MAX_SIZE 255
-#ifndef GIT_VERSION
-#error "GIT_VERSION NOT DEFINED"
-#endif
-
-const char *argp_program_version = "gen_file-1.0.5-dev-" GIT_VERSION;
-const char *argp_program_bug_address = "bachm44@gmail.com";
 
 static struct argp_option options[] = {
     {"verbose", 'v', 0, OPTION_ARG_OPTIONAL, "Verbose output", 0},
@@ -42,10 +29,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
       }
     }
 
-    arguments->seed = atoi(arg);
+    arguments->gen.seed = atoi(arg);
     break;
   case 's':
-    arguments->size = arg;
+    arguments->gen.size = arg;
     break;
   case 't':
     if (strlen(arg) != 1 || (arg[0] != '0' && arg[0] != '1')) {
@@ -54,9 +41,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
       argp_usage(state);
     }
 
-    arguments->type = atoi(arg);
+    arguments->gen.type = atoi(arg);
     break;
-  case ARGP_KEY_NO_ARGS:
+  case '' case ARGP_KEY_NO_ARGS:
     fprintf(stderr, "FILENAME missing.\n");
     break;
   case ARGP_KEY_ARG:
@@ -64,7 +51,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
       fprintf(stderr, "Too many cli arguments.\n");
       argp_usage(state);
     }
-    arguments->filename = arg;
+    arguments->gen.filename = arg;
     break;
   case ARGP_KEY_END:
     if (state->arg_num < 1) {
@@ -82,8 +69,6 @@ static const char args_doc[] = "FILENAME";
 
 static const char doc[] =
     "gen_file -- A program to generate random file with fixed seed ";
-
-static struct argp argp = {options, parse_opt, args_doc, doc, .children = NULL};
 
 void validate(const struct arguments *arguments) {
   bool_t is_error = FALSE;
@@ -106,9 +91,4 @@ void validate(const struct arguments *arguments) {
   if (is_error) {
     exit(EXIT_FAILURE);
   }
-}
-
-void parse(int argc, char *argv[], struct arguments *arguments) {
-  argp_parse(&argp, argc, argv, 0, 0, arguments);
-  validate(arguments);
 }
