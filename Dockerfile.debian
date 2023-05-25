@@ -1,0 +1,9 @@
+FROM debian
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /src
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install debmake build-essential -y
+ 

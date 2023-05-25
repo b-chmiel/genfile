@@ -108,7 +108,7 @@ static int write_chunks(uint64_t chunk_size, uint64_t size_bytes, FILE *file,
   return EXIT_SUCCESS;
 }
 
-int gen_file(const struct arguments *arguments) {
+int genfile(const struct arguments *arguments) {
   const uint64_t size_bytes = parse_size(arguments->size);
   fprintf(stderr, "Writing file with size %ld bytes\n", size_bytes);
 

@@ -2,7 +2,7 @@ SHELL = /bin/sh
 
 BUILD_DIR_RELEASE = build_release
 BUILD_DIR_DEBUG = build
-TARGET = $(BUILD_DIR_DEBUG)/src/gen_file
+TARGET = $(BUILD_DIR_DEBUG)/src/genfile
 ARGP_PATH=$(shell pwd)/external/argp-standalone
 ARGP_LIB=$(ARGP_PATH)/libargp.a
 
