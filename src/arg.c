@@ -12,7 +12,7 @@
 #error "GIT_VERSION NOT DEFINED"
 #endif
 
-const char *argp_program_version = "gen_file-1.0.5-dev-" GIT_VERSION;
+const char *argp_program_version = "genfile-1.0.5-dev-" GIT_VERSION;
 const char *argp_program_bug_address = "bachm44@gmail.com";
 
 static struct argp_option options[] = {
@@ -81,7 +81,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 static const char args_doc[] = "FILENAME";
 
 static const char doc[] =
-    "gen_file -- A program to generate random file with fixed seed ";
+    "genfile -- A program to generate random file with fixed seed ";
 
 static struct argp argp = {options, parse_opt, args_doc, doc, .children = NULL};
 

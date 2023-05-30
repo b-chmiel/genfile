@@ -1,4 +1,4 @@
-# gen_file
+# genfile
 
 ## Requirements
 
@@ -15,7 +15,7 @@
 
 ## Usage
 
-`gen_file --help` - show help and usage examples
+`genfile --help` - show help and usage examples
 
 ## Installation
 

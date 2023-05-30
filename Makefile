@@ -2,7 +2,7 @@ SHELL = /bin/sh
 
 BUILD_DIR_RELEASE = build_release
 BUILD_DIR_DEBUG = build
-TARGET = $(BUILD_DIR_DEBUG)/src/gen_file
+TARGET = $(BUILD_DIR_DEBUG)/src/genfile
 ARGP_PATH=$(shell pwd)/external/argp-standalone
 ARGP_LIB=$(ARGP_PATH)/libargp.a
 
@@ -44,6 +44,26 @@ env/touchfile: requirements.txt
 
 test: env $(TARGET)
 	. env/bin/activate && pytest test/test.py
+
+
+IMAGE_NAME=genfile-dev
+CONTAINER_NAME=genfile-dev-container
+
+define run_in_docker
+	docker build -t $(IMAGE_NAME) -f Dockerfile.debian .
+	- docker run -v $(shell pwd):/app --rm --name $(CONTAINER_NAME) -d -it $(IMAGE_NAME) bash
+	docker exec $(CONTAINER_NAME) $(1)
+	docker stop $(CONTAINER_NAME)
+endef
+
+deb: dist
+	mkdir -pv $(BUILD_DIR_RELEASE)/genfile/usr/bin
+	cp -R DEBIAN $(BUILD_DIR_RELEASE)/genfile/
+	cp build/src/genfile $(BUILD_DIR_RELEASE)/genfile/usr/bin
+	dpkg-deb --build $(BUILD_DIR_RELEASE)/genfile
+
+deb-docker:
+	$(call run_in_docker, make deb)
 
 clean:
 	-rm -rfv $(BUILD_DIR_DEBUG)

@@ -22,5 +22,5 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  return gen_file(&arguments);
+  return genfile(&arguments);
 }

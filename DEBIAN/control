@@ -1,0 +1,9 @@
+Package: genfile
+Version: 1.0.5
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 1024
+Maintainer: bachm44@gmail.com
+Description: A program to generate random file with fixed seed

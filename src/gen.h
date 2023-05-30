@@ -3,6 +3,6 @@
 
 struct arguments;
 
-int gen_file(const struct arguments *);
+int genfile(const struct arguments *);
 
 #endif
