@@ -17,9 +17,10 @@ configure:
 	autoreconf --install
 
 dist: configure
-	-mkdir -v $(BUILD_DIR_RELEASE)
+	-mkdir -pv $(BUILD_DIR_RELEASE)
 	cd $(BUILD_DIR_RELEASE) && ../configure CFLAGS='-Ofast -Wall -Wextra -pedantic'
 	$(MAKE) -C $(BUILD_DIR_RELEASE) dist
+	$(MAKE) -C $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_DEBUG): configure $(ARGP_LIB)
 	-mkdir -v $(BUILD_DIR_DEBUG)
@@ -53,13 +54,14 @@ define run_in_docker
 	docker build -t $(IMAGE_NAME) -f Dockerfile.debian .
 	- docker run -v $(shell pwd):/app --rm --name $(CONTAINER_NAME) -d -it $(IMAGE_NAME) bash
 	docker exec $(CONTAINER_NAME) $(1)
-	docker stop $(CONTAINER_NAME)
+	docker kill $(CONTAINER_NAME)
+	sudo chown $(USER):$(USER) -R .
 endef
 
 deb: dist
 	mkdir -pv $(BUILD_DIR_RELEASE)/genfile/usr/bin
 	cp -R DEBIAN $(BUILD_DIR_RELEASE)/genfile/
-	cp build/src/genfile $(BUILD_DIR_RELEASE)/genfile/usr/bin
+	cp $(BUILD_DIR_RELEASE)/src/genfile $(BUILD_DIR_RELEASE)/genfile/usr/bin
 	dpkg-deb --build $(BUILD_DIR_RELEASE)/genfile
 
 deb-docker:
